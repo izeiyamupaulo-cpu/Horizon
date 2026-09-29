@@ -1,0 +1,702 @@
+<html lang="en" class="h-full bg-slate-50">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Portal Engine - Dynamic White-Label Template</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Alpine.js for dynamic frontend interactions -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <!-- Google Fonts: Inter & Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        heading: ['Plus Jakarta Sans', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        [x-cloak] { display: none !important; }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+    </style>
+</head>
+<body class="h-full font-sans text-slate-900 antialiased selection:bg-indigo-500 selection:text-white" 
+      x-data="portalState()">
+
+    <!-- TOP META BRANDING BAR (The "Under Our Control" Master Header) -->
+    <div class="bg-slate-900 text-white text-xs py-2.5 px-4 sticky top-0 z-50 flex flex-wrap justify-between items-center border-b border-slate-800 shadow-sm">
+        <div class="flex items-center space-x-2.5">
+            <span class="flex h-2 w-2 relative">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+            </span>
+            <span class="font-medium text-slate-300">SaaS Control Engine Demo</span>
+            <span class="text-slate-500">|</span>
+            <span class="bg-indigo-500/20 text-indigo-300 px-2 py-0.5 rounded text-[10px] font-semibold tracking-wider uppercase">Enterprise Template</span>
+        </div>
+        <div class="flex items-center space-x-4 mt-1 sm:mt-0">
+            <span class="text-slate-400 hidden md:inline">Routing traffic for: <strong class="text-white" x-text="subdomain + '.supportflow.io'"></strong></span>
+            <button @click="showCustomizer = !showCustomizer" class="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-1 px-3 rounded-md transition-all flex items-center space-x-1.5 shadow-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"/>
+                </svg>
+                <span x-text="showCustomizer ? 'Hide Controls' : 'Customize Template'">Customize Template</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- MAIN WRAPPER FOR DYNAMIC STYLING -->
+    <div class="relative min-h-screen flex flex-col justify-between">
+        
+        <!-- WHITE-LABEL CUSTOMER FACING PORTAL (SKELETON & RENDER) -->
+        <div class="flex-grow">
+            
+            <!-- Dynamic Navigation -->
+            <header class="bg-white border-b border-slate-100 transition-colors duration-300">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="flex justify-between h-16 items-center">
+                        <!-- Brand/Logo -->
+                        <div class="flex items-center space-x-3">
+                            <div class="p-2.5 rounded-xl transition-all duration-300" :class="colorMap[accentColor].bgLight">
+                                <template x-if="logoStyle === 'tech'">
+                                    <svg class="h-6 w-6 transition-all duration-300" :class="colorMap[accentColor].text" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                    </svg>
+                                </template>
+                                <template x-if="logoStyle === 'heart'">
+                                    <svg class="h-6 w-6 transition-all duration-300" :class="colorMap[accentColor].text" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                                    </svg>
+                                </template>
+                                <template x-if="logoStyle === 'shield'">
+                                    <svg class="h-6 w-6 transition-all duration-300" :class="colorMap[accentColor].text" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                                    </svg>
+                                </template>
+                            </div>
+                            <span class="font-heading font-bold text-xl tracking-tight text-slate-900" x-text="companyName"></span>
+                        </div>
+
+                        <!-- Navigation items -->
+                        <nav class="hidden md:flex space-x-8 text-sm font-medium text-slate-600">
+                            <a href="#knowledgebase" class="hover:text-slate-900 transition-colors">Knowledge Base</a>
+                            <a href="#tickets" class="hover:text-slate-900 transition-colors">Submit Ticket</a>
+                            <a href="#announcements" class="hover:text-slate-900 transition-colors">Updates</a>
+                            <a href="#contact" class="hover:text-slate-900 transition-colors" x-show="showContactInfo">Contact Us</a>
+                        </nav>
+
+                        <!-- Call To Action -->
+                        <div class="flex items-center space-x-4">
+                            <a href="#tickets" class="hidden sm:inline-flex items-center justify-center px-4 py-2 text-sm font-semibold rounded-lg shadow-sm transition-all duration-200"
+                               :class="colorMap[accentColor].bg + ' ' + colorMap[accentColor].hoverBg + ' text-white'">
+                                New Ticket
+                            </a>
+                            <button @click="mobileMenuOpen = !mobileMenuOpen" class="md:hidden p-2 rounded-lg hover:bg-slate-100">
+                                <svg class="h-6 w-6 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mobile Menu -->
+                <div x-show="mobileMenuOpen" x-transition class="md:hidden bg-white border-t border-slate-100 py-3 px-4 space-y-2">
+                    <a href="#knowledgebase" class="block py-2 text-slate-700 hover:text-slate-900">Knowledge Base</a>
+                    <a href="#tickets" class="block py-2 text-slate-700 hover:text-slate-900">Submit Ticket</a>
+                    <a href="#announcements" class="block py-2 text-slate-700 hover:text-slate-900">Updates</a>
+                    <a href="#contact" x-show="showContactInfo" class="block py-2 text-slate-700 hover:text-slate-900">Contact Us</a>
+                    <a href="#tickets" class="block text-center py-2.5 rounded-lg text-white font-medium shadow-sm" :class="colorMap[accentColor].bg">
+                        New Ticket
+                    </a>
+                </div>
+            </header>
+
+            <!-- Hero Section / Search Bar -->
+            <section class="relative overflow-hidden py-16 sm:py-24 transition-colors duration-300" 
+                     :class="heroStyle === 'gradient' ? 'bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 text-white' : 'bg-white text-slate-900 border-b border-slate-100'">
+                <div class="max-w-4xl mx-auto px-4 sm:px-6 text-center relative z-10">
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold tracking-wider uppercase mb-4"
+                          :class="heroStyle === 'gradient' ? 'bg-white/10 text-white' : colorMap[accentColor].bgLight + ' ' + colorMap[accentColor].text">
+                        Support Center
+                    </span>
+                    <h1 class="font-heading font-extrabold text-3xl sm:text-5xl tracking-tight leading-tight" 
+                        x-text="heroTitle">
+                    </h1>
+                    <p class="mt-4 text-base sm:text-lg max-w-xl mx-auto"
+                       :class="heroStyle === 'gradient' ? 'text-slate-300' : 'text-slate-600'">
+                        Search our self-service knowledge base, view user guides, or open a conversation with our support specialists.
+                    </p>
+
+                    <!-- Large Search Box -->
+                    <div class="mt-8 max-w-2xl mx-auto relative">
+                        <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
+                            <svg class="h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
+                        </div>
+                        <input type="text" 
+                               x-model="searchQuery" 
+                               @input="filterArticles()"
+                               placeholder="Search for articles, guides, answers..." 
+                               class="block w-full rounded-2xl border-0 py-4 pl-12 pr-4 text-slate-900 shadow-xl ring-1 ring-slate-900/5 placeholder:text-slate-400 focus:ring-2 focus:ring-offset-2 transition-all"
+                               :class="'focus:ring-' + accentColor + '-500'">
+                    </div>
+                </div>
+                
+                <!-- Background decorative shapes (only on gradient style) -->
+                <template x-if="heroStyle === 'gradient'">
+                    <div class="absolute inset-0 opacity-30 pointer-events-none">
+                        <div class="absolute -top-10 -left-10 w-48 h-48 rounded-full bg-indigo-500 blur-3xl"></div>
+                        <div class="absolute bottom-10 right-10 w-72 h-72 rounded-full bg-blue-500 blur-3xl"></div>
+                    </div>
+                </template>
+            </section>
+
+            <!-- Quick Help Categories (Cards) -->
+            <section id="knowledgebase" class="py-12 sm:py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center md:text-left mb-10">
+                    <h2 class="font-heading font-bold text-2xl text-slate-900">Popular Help Topics</h2>
+                    <p class="text-slate-500 text-sm mt-1">Select a category to quickly find answers.</p>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <!-- Cat 1 -->
+                    <div class="group relative rounded-2xl bg-white p-6 shadow-sm border border-slate-100 hover:shadow-md transition-all duration-200 cursor-pointer">
+                        <div class="p-3 rounded-xl w-fit transition-all duration-200" :class="colorMap[accentColor].bgLight + ' ' + colorMap[accentColor].text">
+                            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+                            </svg>
+                        </div>
+                        <h3 class="font-heading font-bold text-lg text-slate-950 mt-4 group-hover:text-indigo-600 transition-colors">Getting Started</h3>
+                        <p class="text-sm text-slate-500 mt-2">Setup guides, product tours, and quick start references.</p>
+                        <span class="mt-4 text-xs font-semibold inline-flex items-center space-x-1" :class="colorMap[accentColor].text">
+                            <span>12 Articles</span>
+                            <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" /></svg>
+                        </span>
+                    </div>
+
+                    <!-- Cat 2 -->
+                    <div class="group relative rounded-2xl bg-white p-6 shadow-sm border border-slate-100 hover:shadow-md transition-all duration-200 cursor-pointer">
+                        <div class="p-3 rounded-xl w-fit transition-all duration-200" :class="colorMap[accentColor].bgLight + ' ' + colorMap[accentColor].text">
+                            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                            </svg>
+                        </div>
+                        <h3 class="font-heading font-bold text-lg text-slate-950 mt-4 group-hover:text-indigo-600 transition-colors">Billing & Invoice</h3>
+                        <p class="text-sm text-slate-500 mt-2">Manage subscription tiers, payment gateways, and invoice histories.</p>
+                        <span class="mt-4 text-xs font-semibold inline-flex items-center space-x-1" :class="colorMap[accentColor].text">
+                            <span>8 Articles</span>
+                            <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" /></svg>
+                        </span>
+                    </div>
+
+                    <!-- Cat 3 -->
+                    <div class="group relative rounded-2xl bg-white p-6 shadow-sm border border-slate-100 hover:shadow-md transition-all duration-200 cursor-pointer">
+                        <div class="p-3 rounded-xl w-fit transition-all duration-200" :class="colorMap[accentColor].bgLight + ' ' + colorMap[accentColor].text">
+                            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z" />
+                            </svg>
+                        </div>
+                        <h3 class="font-heading font-bold text-lg text-slate-950 mt-4 group-hover:text-indigo-600 transition-colors">Integrations</h3>
+                        <p class="text-sm text-slate-500 mt-2">Connect APIs, trigger webhooks, and interface with standard tools.</p>
+                        <span class="mt-4 text-xs font-semibold inline-flex items-center space-x-1" :class="colorMap[accentColor].text">
+                            <span>15 Articles</span>
+                            <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" /></svg>
+                        </span>
+                    </div>
+
+                    <!-- Cat 4 -->
+                    <div class="group relative rounded-2xl bg-white p-6 shadow-sm border border-slate-100 hover:shadow-md transition-all duration-200 cursor-pointer">
+                        <div class="p-3 rounded-xl w-fit transition-all duration-200" :class="colorMap[accentColor].bgLight + ' ' + colorMap[accentColor].text">
+                            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                            </svg>
+                        </div>
+                        <h3 class="font-heading font-bold text-lg text-slate-950 mt-4 group-hover:text-indigo-600 transition-colors">Security & Trust</h3>
+                        <p class="text-sm text-slate-500 mt-2">Data governance policies, GDPR compliances, and MFA settings.</p>
+                        <span class="mt-4 text-xs font-semibold inline-flex items-center space-x-1" :class="colorMap[accentColor].text">
+                            <span>6 Articles</span>
+                            <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" /></svg>
+                        </span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Promoted/Searchable FAQ Section -->
+            <section class="bg-slate-100/50 py-16 transition-all duration-300" x-show="showFaq">
+                <div class="max-w-4xl mx-auto px-4 sm:px-6">
+                    <div class="text-center mb-12">
+                        <h2 class="font-heading font-bold text-2xl text-slate-950">Promoted Articles & FAQs</h2>
+                        <p class="text-slate-500 text-sm mt-1">Frequently asked questions about our services.</p>
+                    </div>
+
+                    <!-- Accordion list -->
+                    <div class="space-y-4">
+                        <template x-for="(faq, index) in filteredFaqs" :key="index">
+                            <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden transition-all duration-300">
+                                <button @click="faq.open = !faq.open" class="w-full flex justify-between items-center p-5 text-left text-slate-900 hover:bg-slate-50 transition-colors">
+                                    <span class="font-semibold text-base" x-text="faq.q"></span>
+                                    <svg class="h-5 w-5 text-slate-400 transition-transform duration-200" :class="faq.open ? 'rotate-180 text-indigo-500' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                </button>
+                                <div x-show="faq.open" x-collapse class="px-5 pb-5 border-t border-slate-100 pt-3">
+                                    <p class="text-sm text-slate-600 leading-relaxed" x-text="faq.a"></p>
+                                </div>
+                            </div>
+                        </template>
+                        <!-- No results state -->
+                        <div x-show="filteredFaqs.length === 0" class="text-center py-8 bg-white rounded-2xl border border-slate-100 shadow-sm">
+                            <svg class="mx-auto h-12 w-12 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <h3 class="mt-2 text-sm font-medium text-slate-900">No matching articles</h3>
+                            <p class="mt-1 text-sm text-slate-500">Try searching different keywords or submit a ticket below.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Support Ticket Intake Form -->
+            <section id="tickets" class="py-16 max-w-4xl mx-auto px-4 sm:px-6">
+                <div class="bg-white rounded-3xl shadow-xl border border-slate-100 overflow-hidden">
+                    <div class="p-8 sm:p-12">
+                        <div class="max-w-xl mx-auto text-center mb-8">
+                            <span class="text-xs font-semibold uppercase tracking-wider px-2.5 py-1 rounded-md" :class="colorMap[accentColor].bgLight + ' ' + colorMap[accentColor].text">Quick Ticket Portal</span>
+                            <h2 class="font-heading font-bold text-2xl sm:text-3xl text-slate-900 mt-2">Cannot find your answer?</h2>
+                            <p class="text-slate-500 text-sm mt-1">Open a direct ticket with our product staff. We usually respond in under an hour.</p>
+                        </div>
+
+                        <!-- Ticket Form Submission State simulation -->
+                        <div x-show="ticketSubmitted" x-transition class="text-center py-10">
+                            <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-emerald-100 text-emerald-600 mb-6">
+                                <svg class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                                </svg>
+                            </div>
+                            <h3 class="text-xl font-bold text-slate-950">Ticket Successfully Submitted!</h3>
+                            <p class="text-slate-500 text-sm mt-2 max-w-md mx-auto">Thank you for contacting us. A confirmation has been sent to your inbox. Your ticket reference code is <strong class="text-slate-800">#SF-9048</strong>.</p>
+                            <button @click="ticketSubmitted = false" class="mt-6 px-4 py-2 border border-slate-300 text-slate-700 text-sm font-medium rounded-lg hover:bg-slate-50 transition-colors">
+                                Submit Another Request
+                            </button>
+                        </div>
+
+                        <form x-show="!ticketSubmitted" @submit.prevent="ticketSubmitted = true" class="space-y-6">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-sm font-semibold text-slate-700 mb-2">Full Name</label>
+                                    <input type="text" required class="block w-full rounded-xl border-slate-200 bg-slate-50 border py-3 px-4 text-slate-900 focus:ring-2 transition-all focus:bg-white" :class="'focus:ring-' + accentColor + '-500 focus:border-' + accentColor + '-500'">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-semibold text-slate-700 mb-2">Work Email Address</label>
+                                    <input type="email" required class="block w-full rounded-xl border-slate-200 bg-slate-50 border py-3 px-4 text-slate-900 focus:ring-2 transition-all focus:bg-white" :class="'focus:ring-' + accentColor + '-500 focus:border-' + accentColor + '-500'">
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-semibold text-slate-700 mb-2">Subject</label>
+                                <input type="text" required class="block w-full rounded-xl border-slate-200 bg-slate-50 border py-3 px-4 text-slate-900 focus:ring-2 transition-all focus:bg-white" :class="'focus:ring-' + accentColor + '-500 focus:border-' + accentColor + '-500'">
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-semibold text-slate-700 mb-2">Issue Priority</label>
+                                <div class="grid grid-cols-3 gap-3">
+                                    <label class="flex justify-center items-center py-3 border border-slate-200 bg-slate-50 rounded-xl cursor-pointer hover:bg-slate-100 transition-colors">
+                                        <input type="radio" name="priority" value="low" class="sr-only" checked>
+                                        <span class="text-sm font-medium text-slate-700">Low</span>
+                                    </label>
+                                    <label class="flex justify-center items-center py-3 border border-slate-200 bg-slate-50 rounded-xl cursor-pointer hover:bg-slate-100 transition-colors">
+                                        <input type="radio" name="priority" value="medium" class="sr-only">
+                                        <span class="text-sm font-medium text-slate-700">Medium</span>
+                                    </label>
+                                    <label class="flex justify-center items-center py-3 border border-slate-200 bg-slate-50 rounded-xl cursor-pointer hover:bg-slate-100 transition-colors">
+                                        <input type="radio" name="priority" value="high" class="sr-only">
+                                        <span class="text-sm font-medium text-slate-700">High</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-semibold text-slate-700 mb-2">Detailed Description</label>
+                                <textarea rows="5" required placeholder="Please describe step-by-step what occurred..." class="block w-full rounded-xl border-slate-200 bg-slate-50 border py-3 px-4 text-slate-900 focus:ring-2 transition-all focus:bg-white" :class="'focus:ring-' + accentColor + '-500 focus:border-' + accentColor + '-500'"></textarea>
+                            </div>
+
+                            <button type="submit" class="w-full py-4 px-6 text-white font-bold rounded-xl shadow-lg transition-all transform hover:-translate-y-0.5 duration-200"
+                                    :class="colorMap[accentColor].bg + ' ' + colorMap[accentColor].hoverBg">
+                                Dispatch Support Ticket
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Contact Panel / Brand Values -->
+            <section id="contact" class="bg-white border-t border-slate-100 py-12" x-show="showContactInfo">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left">
+                    <div class="flex flex-col items-center md:items-start p-4">
+                        <div class="p-3 bg-slate-100 rounded-full mb-4">
+                            <svg class="h-6 w-6 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                            </svg>
+                        </div>
+                        <h4 class="font-heading font-bold text-lg text-slate-900">Email Support</h4>
+                        <p class="text-slate-500 text-sm mt-1">Directly communicate via electronic mail.</p>
+                        <a href="mailto:support@company.com" class="mt-3 text-sm font-semibold underline" :class="colorMap[accentColor].text" x-text="contactEmail"></a>
+                    </div>
+                    
+                    <div class="flex flex-col items-center md:items-start p-4">
+                        <div class="p-3 bg-slate-100 rounded-full mb-4">
+                            <svg class="h-6 w-6 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.94.725l.548 2.2a1 1 0 01-.321.988l-1.305.98a10.582 10.582 0 004.872 4.872l.98-1.305a1 1 0 01.988-.321l2.2.548a1 1 0 01.725.94V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                            </svg>
+                        </div>
+                        <h4 class="font-heading font-bold text-lg text-slate-900">Call Us Directly</h4>
+                        <p class="text-slate-500 text-sm mt-1">Talk to human technicians on standard lines.</p>
+                        <span class="mt-3 text-sm font-semibold text-slate-700" x-text="contactPhone"></span>
+                    </div>
+
+                    <div class="flex flex-col items-center md:items-start p-4">
+                        <div class="p-3 bg-slate-100 rounded-full mb-4">
+                            <svg class="h-6 w-6 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                        <h4 class="font-heading font-bold text-lg text-slate-900">Guaranteed Response</h4>
+                        <p class="text-slate-500 text-sm mt-1">We maintain strict SLAs around global availability.</p>
+                        <span class="mt-3 text-sm font-semibold text-slate-700">99.9% Ticket Resolved SLA</span>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+
+        <!-- WHITE-LABEL FOOTER (Maintains SaaS parent copyright / under our control) -->
+        <footer class="bg-slate-900 text-slate-400 py-12 border-t border-slate-800">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center space-y-6 md:space-y-0 text-sm">
+                <div class="flex items-center space-x-3">
+                    <span class="font-heading font-bold text-white text-lg" x-text="companyName"></span>
+                    <span>&copy; <span x-text="new Date().getFullYear()"></span>. All rights reserved.</span>
+                </div>
+                
+                <div class="flex space-x-6 text-slate-500">
+                    <a href="#" class="hover:text-white transition-colors">Terms of Service</a>
+                    <a href="#" class="hover:text-white transition-colors">Privacy Policy</a>
+                    <a href="#" class="hover:text-white transition-colors">SLA Agreement</a>
+                </div>
+
+                <div class="flex items-center space-x-2 text-xs bg-slate-950 px-3 py-1.5 rounded-full border border-slate-800">
+                    <span>Engineered via</span>
+                    <span class="text-indigo-400 font-bold uppercase tracking-wider">SupportFlow</span>
+                </div>
+            </div>
+        </footer>
+
+        <!-- LIVE CHAT WIDGET (Toggled via Admin dashboard sidebar) -->
+        <div x-show="showChat" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-10 scale-95" x-transition:enter-end="opacity-100 translate-y-0 scale-100" class="fixed bottom-6 right-6 z-40">
+            <div x-show="chatOpen" class="w-80 h-96 bg-white rounded-2xl shadow-2xl border border-slate-100 overflow-hidden flex flex-col">
+                <!-- Chat Header -->
+                <div class="p-4 flex justify-between items-center text-white" :class="colorMap[accentColor].bg">
+                    <div class="flex items-center space-x-2">
+                        <div class="h-2 w-2 rounded-full bg-emerald-400"></div>
+                        <span class="font-bold text-sm" x-text="companyName + ' Agent'"></span>
+                    </div>
+                    <button @click="chatOpen = false" class="text-white hover:text-slate-200">
+                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                    </button>
+                </div>
+                <!-- Chat Body -->
+                <div class="flex-grow p-4 bg-slate-50 space-y-3 overflow-y-auto text-xs">
+                    <div class="bg-white p-3 rounded-lg border border-slate-100 max-w-[80%]">
+                        Hello! Welcome to the support line for <strong x-text="companyName"></strong>. How can we help you solve your problem?
+                    </div>
+                </div>
+                <!-- Chat Input -->
+                <div class="p-3 bg-white border-t border-slate-100 flex items-center">
+                    <input type="text" placeholder="Type your message..." class="w-full border-0 focus:ring-0 text-xs px-2 py-1">
+                    <button class="p-1.5 rounded-lg text-white" :class="colorMap[accentColor].bg">
+                        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Floating Bubble -->
+            <button x-show="!chatOpen" @click="chatOpen = true" class="p-4 rounded-full text-white shadow-2xl transition-transform hover:scale-110 flex items-center justify-center"
+                    :class="colorMap[accentColor].bg">
+                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                </svg>
+            </button>
+        </div>
+
+        <!-- SAAS PLATFORM DEMO CONTROL PANEL (Floating Sidebar on Desktop / Expandable menu) -->
+        <div x-show="showCustomizer" 
+             x-transition:enter="transition ease-out duration-300"
+             x-transition:enter-start="opacity-0 translate-x-full"
+             x-transition:enter-end="opacity-100 translate-x-0"
+             class="fixed top-15 right-0 h-[calc(100vh-44px)] w-full sm:w-96 bg-white border-l border-slate-200 shadow-2xl z-40 overflow-y-auto transform transition-transform">
+            
+            <div class="p-6 space-y-8">
+                <!-- Header of customizer -->
+                <div class="flex justify-between items-center border-b border-slate-100 pb-4">
+                    <div>
+                        <h3 class="font-heading font-extrabold text-lg text-slate-900">Customizer Controls</h3>
+                        <p class="text-xs text-slate-500">Live customization of tenant customer portals.</p>
+                    </div>
+                    <button @click="showCustomizer = false" class="p-1 rounded-lg hover:bg-slate-100">
+                        <svg class="h-5 w-5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Live Subdomain URL Preview -->
+                <div class="bg-slate-50 rounded-2xl p-4 border border-slate-100 space-y-2">
+                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Generated Landing Subdomain</span>
+                    <div class="flex items-center space-x-1.5 text-sm bg-white border border-slate-200 rounded-lg py-2 px-3 shadow-sm select-all">
+                        <svg class="h-4 w-4 text-emerald-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M2.166 4.9c.77-.3 1.685-.4 2.534-.4 2.11 0 4.195.8 5.3 1.8 1.105-1 3.19-1.8 5.3-1.8.85 0 1.763.1 2.534.4a.5.5 0 01.32.46v10.915a.5.5 0 01-.528.5c-.808-.075-1.748-.15-2.586-.15-1.92 0-4.037.8-5.12 1.62a.5.5 0 01-.64 0C9.337 17.5 7.22 16.7 5.3 16.7c-.838 0-1.778.075-2.585.15a.5.5 0 01-.528-.5V5.36a.5.5 0 01.32-.46z" clip-rule="evenodd"/>
+                        </svg>
+                        <span class="font-mono text-xs text-slate-700" x-text="'https://' + subdomain + '.supportflow.io'"></span>
+                    </div>
+                </div>
+
+                <!-- Form customization values -->
+                <div class="space-y-6">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Primary Subdomain Tag</label>
+                        <input type="text" x-model="subdomain" class="block w-full text-sm rounded-xl border-slate-200 bg-slate-50 border py-2.5 px-4 text-slate-900 focus:ring-2 focus:ring-indigo-500 focus:bg-white focus:border-indigo-500 transition-all">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Company Brand Name</label>
+                        <input type="text" x-model="companyName" class="block w-full text-sm rounded-xl border-slate-200 bg-slate-50 border py-2.5 px-4 text-slate-900 focus:ring-2 focus:ring-indigo-500 focus:bg-white focus:border-indigo-500 transition-all">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Hero Header Text</label>
+                        <input type="text" x-model="heroTitle" class="block w-full text-sm rounded-xl border-slate-200 bg-slate-50 border py-2.5 px-4 text-slate-900 focus:ring-2 focus:ring-indigo-500 focus:bg-white focus:border-indigo-500 transition-all">
+                    </div>
+
+                    <!-- Layout Options -->
+                    <div>
+                        <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Accent Theme Color</label>
+                        <div class="grid grid-cols-6 gap-2">
+                            <button @click="accentColor = 'indigo'" class="h-8 w-full rounded-full bg-indigo-600 border-2" :class="accentColor === 'indigo' ? 'border-slate-900 shadow-md scale-105' : 'border-transparent'"></button>
+                            <button @click="accentColor = 'emerald'" class="h-8 w-full rounded-full bg-emerald-600 border-2" :class="accentColor === 'emerald' ? 'border-slate-900 shadow-md scale-105' : 'border-transparent'"></button>
+                            <button @click="accentColor = 'rose'" class="h-8 w-full rounded-full bg-rose-600 border-2" :class="accentColor === 'rose' ? 'border-slate-900 shadow-md scale-105' : 'border-transparent'"></button>
+                            <button @click="accentColor = 'blue'" class="h-8 w-full rounded-full bg-blue-600 border-2" :class="accentColor === 'blue' ? 'border-slate-900 shadow-md scale-105' : 'border-transparent'"></button>
+                            <button @click="accentColor = 'amber'" class="h-8 w-full rounded-full bg-amber-500 border-2" :class="accentColor === 'amber' ? 'border-slate-900 shadow-md scale-105' : 'border-transparent'"></button>
+                            <button @click="accentColor = 'violet'" class="h-8 w-full rounded-full bg-violet-600 border-2" :class="accentColor === 'violet' ? 'border-slate-900 shadow-md scale-105' : 'border-transparent'"></button>
+                        </div>
+                    </div>
+
+                    <!-- Logo Style Selectors -->
+                    <div>
+                        <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">SVG Logo Mark</label>
+                        <div class="grid grid-cols-3 gap-2">
+                            <button @click="logoStyle = 'tech'" class="text-xs py-2 px-3 border rounded-xl font-semibold flex items-center justify-center space-x-1" :class="logoStyle === 'tech' ? 'bg-slate-900 text-white border-slate-900' : 'bg-slate-50 border-slate-200 text-slate-700'">
+                                <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                                <span>Flash</span>
+                            </button>
+                            <button @click="logoStyle = 'heart'" class="text-xs py-2 px-3 border rounded-xl font-semibold flex items-center justify-center space-x-1" :class="logoStyle === 'heart' ? 'bg-slate-900 text-white border-slate-900' : 'bg-slate-50 border-slate-200 text-slate-700'">
+                                <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
+                                <span>Pulse</span>
+                            </button>
+                            <button @click="logoStyle = 'shield'" class="text-xs py-2 px-3 border rounded-xl font-semibold flex items-center justify-center space-x-1" :class="logoStyle === 'shield' ? 'bg-slate-900 text-white border-slate-900' : 'bg-slate-50 border-slate-200 text-slate-700'">
+                                <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944A11.955 11.955 0 013 9" /></svg>
+                                <span>Trust</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Hero Layout Selector -->
+                    <div>
+                        <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Hero Header Layout</label>
+                        <div class="grid grid-cols-2 gap-2">
+                            <button @click="heroStyle = 'gradient'" class="text-xs py-2 px-3 border rounded-xl font-semibold flex items-center justify-center" :class="heroStyle === 'gradient' ? 'bg-slate-900 text-white border-slate-900' : 'bg-slate-50 border-slate-200 text-slate-700'">
+                                Dark Gradient
+                            </button>
+                            <button @click="heroStyle = 'light'" class="text-xs py-2 px-3 border rounded-xl font-semibold flex items-center justify-center" :class="heroStyle === 'light' ? 'bg-slate-900 text-white border-slate-900' : 'bg-slate-50 border-slate-200 text-slate-700'">
+                                Minimalist Light
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Toggle Control Flags -->
+                    <div class="space-y-4 pt-4 border-t border-slate-100">
+                        <label class="flex items-center justify-between cursor-pointer">
+                            <span class="text-xs font-bold text-slate-700 uppercase tracking-wider">Promoted Articles Section</span>
+                            <div class="relative">
+                                <input type="checkbox" x-model="showFaq" class="sr-only">
+                                <div class="w-10 h-6 bg-slate-200 rounded-full transition-colors" :class="showFaq ? 'bg-emerald-500' : 'bg-slate-200'"></div>
+                                <div class="absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform" :class="showFaq ? 'translate-x-4' : ''"></div>
+                            </div>
+                        </label>
+
+                        <label class="flex items-center justify-between cursor-pointer">
+                            <span class="text-xs font-bold text-slate-700 uppercase tracking-wider">Live Chat Bubble Widget</span>
+                            <div class="relative">
+                                <input type="checkbox" x-model="showChat" class="sr-only">
+                                <div class="w-10 h-6 bg-slate-200 rounded-full transition-colors" :class="showChat ? 'bg-emerald-500' : 'bg-slate-200'"></div>
+                                <div class="absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform" :class="showChat ? 'translate-x-4' : ''"></div>
+                            </div>
+                        </label>
+
+                        <label class="flex items-center justify-between cursor-pointer">
+                            <span class="text-xs font-bold text-slate-700 uppercase tracking-wider">Footer Contact Options</span>
+                            <div class="relative">
+                                <input type="checkbox" x-model="showContactInfo" class="sr-only">
+                                <div class="w-10 h-6 bg-slate-200 rounded-full transition-colors" :class="showContactInfo ? 'bg-emerald-500' : 'bg-slate-200'"></div>
+                                <div class="absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform" :class="showContactInfo ? 'translate-x-4' : ''"></div>
+                            </div>
+                        </label>
+                    </div>
+
+                    <!-- Contact Details customization -->
+                    <div x-show="showContactInfo" x-collapse class="space-y-4 pt-2">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-500 mb-1">Support Email</label>
+                            <input type="text" x-model="contactEmail" class="block w-full text-xs rounded-lg border-slate-200 bg-slate-50 border py-2 px-3 text-slate-900 focus:ring-1 focus:ring-indigo-500 transition-all">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-500 mb-1">Direct Line Phone</label>
+                            <input type="text" x-model="contactPhone" class="block w-full text-xs rounded-lg border-slate-200 bg-slate-50 border py-2 px-3 text-slate-900 focus:ring-1 focus:ring-indigo-500 transition-all">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Build Confirmation Action -->
+                <div class="pt-6 border-t border-slate-100">
+                    <button @click="showCustomizer = false; alert('Your customer site configurations were compiled successfully under the master routing block!')" 
+                            class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 px-4 rounded-xl shadow-lg transition-all text-sm flex items-center justify-center space-x-2">
+                        <svg class="h-4 w-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+                        </svg>
+                        <span>Compile & Apply Config</span>
+                    </button>
+                    <p class="text-[10px] text-slate-400 text-center mt-2.5">Saving this deployment automatically builds a live Kubernetes target and provisions a TLS/SSL certificate from Let's Encrypt.</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Alpine.js State Implementation -->
+    <script>
+        function portalState() {
+            return {
+                // Template configuration state (Simulates database parameters dynamically rendered on SaaS route resolution)
+                showCustomizer: true,
+                subdomain: 'apexglobal',
+                companyName: 'ApexGlobal',
+                heroTitle: 'How can we help you today?',
+                accentColor: 'indigo',
+                logoStyle: 'tech',
+                heroStyle: 'gradient',
+                showFaq: true,
+                showChat: true,
+                showContactInfo: true,
+                contactEmail: 'support@apexglobal.com',
+                contactPhone: '+1 (800) 555-0199',
+                
+                // Active UI state variables
+                chatOpen: false,
+                mobileMenuOpen: false,
+                ticketSubmitted: false,
+                searchQuery: '',
+                
+                // Color map mapping human names to Tailwind tokens correctly (essential for tailwind JIT execution safety)
+                colorMap: {
+                    indigo: {
+                        bg: 'bg-indigo-600',
+                        hoverBg: 'hover:bg-indigo-700',
+                        text: 'text-indigo-600',
+                        bgLight: 'bg-indigo-50',
+                        border: 'border-indigo-600'
+                    },
+                    emerald: {
+                        bg: 'bg-emerald-600',
+                        hoverBg: 'hover:bg-emerald-700',
+                        text: 'text-emerald-600',
+                        bgLight: 'bg-emerald-50',
+                        border: 'border-emerald-600'
+                    },
+                    rose: {
+                        bg: 'bg-rose-600',
+                        hoverBg: 'hover:bg-rose-700',
+                        text: 'text-rose-600',
+                        bgLight: 'bg-rose-50',
+                        border: 'border-rose-600'
+                    },
+                    blue: {
+                        bg: 'bg-blue-600',
+                        hoverBg: 'hover:bg-blue-700',
+                        text: 'text-blue-600',
+                        bgLight: 'bg-blue-50',
+                        border: 'border-blue-600'
+                    },
+                    amber: {
+                        bg: 'bg-amber-500',
+                        hoverBg: 'hover:bg-amber-600',
+                        text: 'text-amber-600',
+                        bgLight: 'bg-amber-50',
+                        border: 'border-amber-500'
+                    },
+                    violet: {
+                        bg: 'bg-violet-600',
+                        hoverBg: 'hover:bg-violet-700',
+                        text: 'text-violet-600',
+                        bgLight: 'bg-violet-50',
+                        border: 'border-violet-600'
+                    }
+                },
+
+                // Simulated KB/FAQ Dataset
+                faqs: [
+                    { q: 'How do I query custom metrics from the global control panel?', a: 'Navigate to telemetry configuration inside options, then generate an analytics bearer key to begin passing standard payload metrics.', open: false },
+                    { q: 'What security compliances are maintained on your database engine?', a: 'All communication points enforce standard TLS 1.3 encryption alongside at-rest AES-256 standard constraints. Compliance logs are issued quarterly.', open: false },
+                    { q: 'Can we route traffic to our native target domains?', a: 'Yes, DNS configurations are custom-mappable using simple standard CNAME structures pointed at the master server ingress point.', open: false },
+                    { q: 'How is user authorization structured for internal staff accounts?', a: 'Tenant managers can utilize standard OpenID and SAML providers to enforce multi-factor credentials across internal teams seamlessly.', open: false }
+                ],
+                filteredFaqs: [],
+
+                init() {
+                    // Initialize the visible filtered FAQ list
+                    this.filteredFaqs = [...this.faqs];
+                    
+                    // Watch subdomain to automatically format string
+                    this.$watch('subdomain', value => {
+                        this.subdomain = value.toLowerCase().replace(/[^a-z0-9]/g, '');
+                    });
+                },
+
+                filterArticles() {
+                    const query = this.searchQuery.toLowerCase().trim();
+                    if (query === '') {
+                        this.filteredFaqs = [...this.faqs];
+                    } else {
+                        this.filteredFaqs = this.faqs.filter(faq => 
+                            faq.q.toLowerCase().includes(query) || 
+                            faq.a.toLowerCase().includes(query)
+                        );
+                    }
+                }
+            }
+        }
+    </script>
+</body>
+</html>
